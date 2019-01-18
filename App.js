@@ -7,7 +7,14 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
+import {
+  AppRegistry,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableHighlight
+} from 'react-native';
 
 const Images = [
   {
@@ -41,21 +48,74 @@ const Images = [
   }
 ];
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android:
-    'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
+// const instructions = Platform.select({
+//   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
+//   android:
+//     'Double tap R on your keyboard to reload,\n' +
+//     'Shake or press menu button for dev menu',
+// });
 
-type Props = {};
-export default class App extends Component<Props> {
+// type Props = {};
+// export default class App extends Component<Props> {
+//   render() {
+//     return (
+//       <View style={styles.container}>
+//         <Text style={styles.welcome}>Welcome to React Native!</Text>
+//         <Text style={styles.instructions}>To get started, edit App.js</Text>
+//         <Text style={styles.instructions}>{instructions}</Text>
+//       </View>
+//     );
+//   }
+// }
+
+export default class JustATributeApp extends Component {
+  constructor() {
+    super();
+    this.state = {
+      index: 0,
+      imageWidth: null
+    };
+  }
+
+  nextImage(event) {
+    const { index, imageWidth } = this.state,
+      X = event.nativeEvent.locationX,
+      delta = (X < imageWidth/2) ? -1 : +1;
+
+    let newIndex = (index + delta) % Images.length;
+
+    if (newIndex < 0) {
+      newIndex = Images.length - Math.abs(newIndex);
+    }
+
+    this.setState({
+      index: newIndex
+    });
+  }
+
+  onImageLayout(event) {
+    this.setState({
+      imageWidth: event.nativeEvent.layout.width
+    });
+  }
+  
   render() {
+    const image = Images[this.state.index];
+
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>To get started, edit App.js</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
+        <View style={styles.empty} />
+        <TouchableHighlight 
+          onPress={this.nextImage.bind(this)}
+          style={styles.image}>
+        <Image 
+          source={{ uri: image.uri }}
+          style={styles.image}
+          onLayout={this.onImageLayout.bind(this)}
+        />
+        </TouchableHighlight>
+        <Text style={styles.imageLabel}>{image.label}</Text>
+        <View style={styles.empty} />
       </View>
     );
   }
